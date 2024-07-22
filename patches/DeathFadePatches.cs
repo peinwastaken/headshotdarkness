@@ -11,11 +11,6 @@ namespace HeadshotDarkness.patches
     {
         public static float _previousVolume { get; private set; }
 
-        private static AnimationCurve _enableCurve = new AnimationCurve(
-            new Keyframe(0f, 0f),
-            new Keyframe(0.05f, 2f)
-        );
-
         static Player GetLocalPlayer()
         {
             GameWorld world = Singleton<GameWorld>.Instance;
@@ -42,6 +37,7 @@ namespace HeadshotDarkness.patches
 
             Player player = GetLocalPlayer();
             Type deathType = typeof(DeathFade);
+            AnimationCurve _enableCurve = Plugin.enableCurve;
 
             if (Plugin.DebugMode.Value == true | player.LastDamagedBodyPart == EBodyPart.Head)
             {
@@ -55,7 +51,7 @@ namespace HeadshotDarkness.patches
                     adjuster.GetOrAddComponent<VolumeAdjuster>();
                 }
 
-                VolumeAdjuster.Instance.StartVolumeAdjust(0f, 0.1f);
+                VolumeAdjuster.Instance.StartVolumeAdjust(0f, Plugin.AudioFadeTime.Value);
             }
         }
     }

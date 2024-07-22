@@ -38,7 +38,7 @@ namespace HeadshotDarkness
             while (_time < duration)
             {
                 _time += Time.deltaTime;
-                AudioListener.volume = Mathf.Clamp(_startVolume + _time / duration, 0, 1);
+                AudioListener.volume = Mathf.Lerp(_startVolume, target, _time / duration);
                 yield return null;
             }
 
