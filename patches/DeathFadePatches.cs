@@ -41,9 +41,20 @@ namespace HeadshotDarkness.patches
 
             if (Plugin.DebugMode.Value == true | player.LastDamagedBodyPart == EBodyPart.Head)
             {
+                if (Plugin.UseAlternateDeathFade.Value == true)
+                {
+                    deathType.GetField("float_3", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 2f);
+                    ScreenFlash.StartFlash(0.5f, false);
+                }
+
+                if (Plugin.DeathTextEnabled.Value == true)
+                {
+                    DeathTextHelper.CreateDeathText(Plugin.DeathTextString.Value, Plugin.DeathTextFontSize.Value, Plugin.DeathTextLifeTime.Value, Plugin.DeathTextFadeInTime.Value, Plugin.DeathTextFadeOutTime.Value, Plugin.DeathTextFadeDelayTime.Value);
+                }
+
                 deathType.GetField("_enableCurve", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, _enableCurve);
                 deathType.GetField("animationCurve_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, _enableCurve);
-                deathType.GetField("bool_0", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(__instance, true);
+                deathType.GetField("bool_0", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(__instance, false);
 
                 if (VolumeAdjuster.Instance == null)
                 {

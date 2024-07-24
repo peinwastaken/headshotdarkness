@@ -47,5 +47,14 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>dependencies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>dependencies\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>dependencies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>dependencies\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
