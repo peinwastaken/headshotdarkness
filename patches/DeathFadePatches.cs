@@ -4,6 +4,8 @@ using Comfort.Common;
 using System;
 using UnityEngine;
 using SPT.Reflection.Patching;
+using BepInEx;
+using System.Collections.Generic;
 
 namespace HeadshotDarkness.patches
 {
@@ -22,6 +24,57 @@ namespace HeadshotDarkness.patches
             return world.MainPlayer;
         }
 
+        private static bool ShouldDeathFade(EBodyPart lastBodyPart, EDamageType damageType)
+        {
+            if (Plugin.ExplosionsDoDarkness.Value == true && (damageType == EDamageType.Explosion || damageType == EDamageType.Landmine || damageType == EDamageType.GrenadeFragment))
+            {
+                return true;
+            }
+
+            if (Plugin.DebugMode.Value == true)
+            {
+                return true;
+            }
+
+            if (lastBodyPart == EBodyPart.Head)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string GetDeathString(EBodyPart lastBodyPart, EDamageType lastDamageType)
+        {
+            bool debug = Plugin.DebugMode.Value;
+            EDeathString stringEnum;
+            if (Plugin.DeathTextContextual.Value)
+            {
+                // explosion
+                if (lastDamageType == EDamageType.Explosion || lastDamageType == EDamageType.GrenadeFragment || lastDamageType == EDamageType.Landmine)
+                {
+                    stringEnum = EDeathString.Explosion;
+                }
+                // headshot
+                else if (lastBodyPart == EBodyPart.Head)
+                {
+                    stringEnum = EDeathString.Headshot;
+                }
+                // AlwaysDoDarkness and not headshot or explosion
+                else
+                {
+                    stringEnum = EDeathString.Generic;
+                }
+            }
+            else
+            {
+                return Plugin.DeathTextString.Value;
+            }
+
+            List<string> list = JsonHelper.GetDeathStrings(stringEnum);
+            return list.GetRandomItem();
+        }
+
         protected override MethodBase GetTargetMethod()
         {
             return typeof(DeathFade).GetMethod(nameof(DeathFade.EnableEffect));
@@ -38,18 +91,23 @@ namespace HeadshotDarkness.patches
             Player player = GetLocalPlayer();
             Type deathType = typeof(DeathFade);
             AnimationCurve _enableCurve = Plugin.enableCurve;
+            EBodyPart lastBodyPart = player.LastDamagedBodyPart;
+            EDamageType lastDamageType = player.LastDamageType;
 
-            if (Plugin.DebugMode.Value == true | player.LastDamagedBodyPart == EBodyPart.Head)
+            if (ShouldDeathFade(lastBodyPart, lastDamageType))
             {
+                string deathText = GetDeathString(lastBodyPart, lastDamageType);
+
                 if (Plugin.UseAlternateDeathFade.Value == true)
                 {
-                    deathType.GetField("float_3", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 2f);
-                    ScreenFlash.StartFlash(0.5f, false);
+                    deathType.GetField("_closeEyesValue", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 1f);
+                    deathType.GetField("_fadeValue", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 1f);
+                    ScreenFlash.StartFlash(0.1f, false);
                 }
 
                 if (Plugin.DeathTextEnabled.Value == true)
                 {
-                    DeathTextHelper.CreateDeathText(Plugin.DeathTextString.Value, Plugin.DeathTextFontSize.Value, Plugin.DeathTextLifeTime.Value, Plugin.DeathTextFadeInTime.Value, Plugin.DeathTextFadeOutTime.Value, Plugin.DeathTextFadeDelayTime.Value);
+                    DeathTextHelper.CreateDeathText(deathText, Plugin.DeathTextFontSize.Value, Plugin.DeathTextLifeTime.Value, Plugin.DeathTextFadeInTime.Value, Plugin.DeathTextFadeOutTime.Value, Plugin.DeathTextFadeDelayTime.Value);
                 }
 
                 deathType.GetField("_enableCurve", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, _enableCurve);

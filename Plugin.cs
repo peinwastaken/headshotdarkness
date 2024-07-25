@@ -3,10 +3,11 @@ using UnityEngine;
 using HeadshotDarkness.patches;
 using BepInEx.Configuration;
 using System;
+using System.Collections.Generic;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.2")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -14,10 +15,12 @@ namespace HeadshotDarkness
 
         public static ConfigEntry<float> ScreenFadeTime { get; set; }
         public static ConfigEntry<bool> UseAlternateDeathFade { get; set; }
+        public static ConfigEntry<bool> ExplosionsDoDarkness { get; set; }
         public static ConfigEntry<float> AudioFadeTime { get; set; }
 
         public static ConfigEntry<bool> DeathTextEnabled { get; set; }
         public static ConfigEntry<string> DeathTextString { get; set; }
+        public static ConfigEntry<bool> DeathTextContextual { get; set; }
         public static ConfigEntry<int> DeathTextFontSize { get; set; }
         public static ConfigEntry<float> DeathTextLifeTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeInTime { get; set; }
@@ -54,8 +57,14 @@ namespace HeadshotDarkness
                     new ConfigurationManagerAttributes { Order = 999 }
                 ));
 
+            ExplosionsDoDarkness = Config.Bind(general, "ExplosionsDoDarkness", false, new ConfigDescription(
+                    "Set if explosions should cause the headshot effect.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 998 }
+                ));
+
             DebugMode = Config.Bind(general, "AlwaysDoDarkness", false, new ConfigDescription(
-                    "Was only here to help me debug, if you for some reason want the headshot effect to always occur then enable it",
+                    "Was only here to help me debug, if you for some reason want the headshot effect to always occur then enable it.",
                     null,
                     new ConfigurationManagerAttributes { Order = 990 }
                 ));
@@ -84,6 +93,12 @@ namespace HeadshotDarkness
                     "Set the headshot text string",
                     null,
                     new ConfigurationManagerAttributes { Order = 950 }
+                ));
+
+            DeathTextContextual = Config.Bind(deathText, "DeathTextContextual", false, new ConfigDescription(
+                    "Set if death texts should be contextual. Pulls random death strings from deathstrings.json depending on how you died instead of using the DeathTextString variable",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 949 }
                 ));
 
             DeathTextFontSize = Config.Bind(deathText, "DeathTextFontSize", 24, new ConfigDescription(
@@ -130,6 +145,8 @@ namespace HeadshotDarkness
         {
             DoConfig();
             DoPatches();
+
+            JsonHelper.Initialize();
 
             enableCurve = new AnimationCurve(
                 new Keyframe(0f, 0f),

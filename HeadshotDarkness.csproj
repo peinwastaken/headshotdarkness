@@ -32,6 +32,9 @@
     <Reference Include="Comfort">
       <HintPath>dependencies\Comfort.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="spt-custom">
       <HintPath>dependencies\spt-custom.dll</HintPath>
     </Reference>
@@ -47,6 +50,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>dependencies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>dependencies\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>dependencies\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
@@ -56,5 +62,11 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>dependencies\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="deathstrings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

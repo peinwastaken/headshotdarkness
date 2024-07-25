@@ -1,0 +1,11 @@
+{
+	"genericDeathStrings": [
+		"You are dead."
+	],
+	"headshotDeathStrings": [
+		"You have been shot in the head."
+	],
+	"explosionDeathStrings": [
+		"You have been blown up."
+	]
+}
