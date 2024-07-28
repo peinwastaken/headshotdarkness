@@ -4,10 +4,11 @@ using HeadshotDarkness.patches;
 using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.3")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.4")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -28,6 +29,7 @@ namespace HeadshotDarkness
         public static ConfigEntry<float> DeathTextFadeDelayTime { get; set; }
 
         public static AnimationCurve enableCurve { get; set; }
+        public static AnimationCurve instantCurve { get; set; }
 
         private void UpdateEnableCurve(object sender, EventArgs args) // weird............
         {
@@ -35,6 +37,12 @@ namespace HeadshotDarkness
             {
                 new Keyframe(0f, 0f),
                 new Keyframe(ScreenFadeTime.Value, 2f)
+            };
+
+            instantCurve.keys = new Keyframe[]
+            {
+                new Keyframe(0f, 0f),
+                new Keyframe(0.001f, 2f)
             };
         }
 
@@ -139,6 +147,7 @@ namespace HeadshotDarkness
         {
             new BeginDeathScreenPatch().Enable();
             new EndDeathScreenPatch().Enable();
+            new PlayUiSoundPatch().Enable();
         }
 
         private void Awake()
