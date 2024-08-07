@@ -8,7 +8,7 @@ using HarmonyLib;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.4")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.5")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -18,6 +18,7 @@ namespace HeadshotDarkness
         public static ConfigEntry<bool> UseAlternateDeathFade { get; set; }
         public static ConfigEntry<bool> ExplosionsDoDarkness { get; set; }
         public static ConfigEntry<float> AudioFadeTime { get; set; }
+        public static ConfigEntry<bool> DisableUIDeathSound { get; set; }
 
         public static ConfigEntry<bool> DeathTextEnabled { get; set; }
         public static ConfigEntry<string> DeathTextString { get; set; }
@@ -75,6 +76,12 @@ namespace HeadshotDarkness
                     "Was only here to help me debug, if you for some reason want the headshot effect to always occur then enable it.",
                     null,
                     new ConfigurationManagerAttributes { Order = 990 }
+                ));
+
+            DisableUIDeathSound = Config.Bind(general, "DisableUIDeathSound", false, new ConfigDescription(
+                    "Prevents the UI death sound from ever playing. It will always be disabled if the headshot effect occurs but this lets you disable it for bodyshot deaths.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 989 }
                 ));
 
             // Parameters

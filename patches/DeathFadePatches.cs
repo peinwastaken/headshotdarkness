@@ -17,11 +17,11 @@ namespace HeadshotDarkness.patches
         }
 
         [PatchPrefix]
-        private static void PatchPreFix(DeathFade __instance)
+        private static bool PatchPreFix(DeathFade __instance)
         {
             if (Plugin.Enabled.Value == false)
             {
-                return;
+                return false;
             }
 
             Player player = Util.GetLocalPlayer();
@@ -68,6 +68,8 @@ namespace HeadshotDarkness.patches
 
                 VolumeAdjuster.Instance.StartVolumeAdjust(0f, Plugin.AudioFadeTime.Value);
             }
+
+            return true;
         }
     }
 
@@ -81,6 +83,17 @@ namespace HeadshotDarkness.patches
         [PatchPostfix]
         private static void PatchPostFix(DeathFade __instance)
         {
+            Type deathType = typeof(DeathFade);
+            AnimationCurve disableCurve = (AnimationCurve)deathType.GetField("_disableCurve", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(__instance);
+            float deathTime = (float)deathType.GetField("_disableTime", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+
+            // enjoy fika friends :)
+            deathType.GetField("animationCurve_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, disableCurve);
+            deathType.GetField("_closeEyesValue", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 0f);
+            deathType.GetField("_fadeValue", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 0f);
+            deathType.GetField("_float_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, deathTime);
+            deathType.GetField("bool_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, false);
+
             if (VolumeAdjuster.Instance == null)
             {
                 GameObject adjuster = new GameObject("VolumeAdjuster");
@@ -109,9 +122,8 @@ namespace HeadshotDarkness.patches
                 EBodyPart lastBodyPart = player.LastDamagedBodyPart;
                 EDamageType lastDamageType = player.LastDamageType;
 
-                if (Util.ShouldDeathFade(lastBodyPart, lastDamageType))
+                if (Util.ShouldDeathFade(lastBodyPart, lastDamageType) || Plugin.DisableUIDeathSound.Value == true)
                 {
-                    Logger.LogInfo("Headshot Darkness is enabled, skipping UI death sound");
                     return false;
                 };
             }
