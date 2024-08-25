@@ -1,10 +1,9 @@
 ﻿using Comfort.Common;
 using EFT;
-using System;
 using System.Collections.Generic;
-using UnityEngine;
+using HeadshotDarkness.Enums;
 
-namespace HeadshotDarkness
+namespace HeadshotDarkness.Helpers
 {
     public static class Util
     {
@@ -19,29 +18,26 @@ namespace HeadshotDarkness
             return world.MainPlayer;
         }
 
-        public static bool ShouldDeathFade(EBodyPart lastBodyPart, EDamageType damageType)
+        public static EDarknessType GetDeathFadeType(EBodyPart lastBodyPart, EDamageType lastDamageType)
         {
-            if (Plugin.ExplosionsDoDarkness.Value == true && (damageType == EDamageType.Explosion || damageType == EDamageType.Landmine || damageType == EDamageType.GrenadeFragment))
-            {
-                return true;
-            }
-
-            if (Plugin.DebugMode.Value == true)
-            {
-                return true;
-            }
-
+            // if headshot
             if (lastBodyPart == EBodyPart.Head)
             {
-                return true;
+                return Plugin.DarknessTypeHeadshot.Value;
             }
 
-            return false;
+            // if explosion
+            if (lastDamageType == EDamageType.Explosion || lastDamageType == EDamageType.GrenadeFragment || lastDamageType == EDamageType.Landmine) 
+            {
+                return Plugin.DarknessTypeExplosion.Value;
+            }
+
+            // if... something... else?
+            return Plugin.DarknessTypeGeneric.Value;
         }
 
         public static string GetDeathString(EBodyPart lastBodyPart, EDamageType lastDamageType)
         {
-            bool debug = Plugin.DebugMode.Value;
             EDeathString stringEnum;
             if (Plugin.DeathTextContextual.Value)
             {

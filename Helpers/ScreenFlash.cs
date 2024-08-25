@@ -7,17 +7,18 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace HeadshotDarkness
+namespace HeadshotDarkness.Helpers
 {
     public class ScreenFlash
     {
         public static GameObject screenFlashObject;
 
-        public static void StartFlash(float duration, bool smoothDecay)
+        // right.. what i should do instead is have an instance with the component and whatnot and run a method and set values but whatever lol
+        public static void StartFlash()
         {
             if (screenFlashObject != null)
             {
-                GameObject.Destroy(screenFlashObject);
+                UnityEngine.Object.Destroy(screenFlashObject);
             }
 
             screenFlashObject = new GameObject("ScreenFlash");
@@ -31,39 +32,18 @@ namespace HeadshotDarkness
             CanvasGroup canvasGroup = screenFlashObject.AddComponent<CanvasGroup>();
 
             ScreenFlashManager manager = screenFlashObject.AddComponent<ScreenFlashManager>();
-            manager.lifeTime = duration;
-            manager.smoothDecay = false;
         }
     }
 
     public class ScreenFlashManager : MonoBehaviour
     {
-        public float lifeTime;
-        public bool smoothDecay;
-
-        private CanvasGroup canvasGroup;
-
-        private float timeAlive = 0f;
-        private float decayTime = 0.4f;
-
         public void Start()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
+            // Uhhh..
         }
 
         public void Update()
         {
-            float time = 0f;
-
-            if (time < lifeTime)
-            {
-                time += Time.deltaTime;
-                if (smoothDecay)
-                {
-                    canvasGroup.alpha = 1f - (time / lifeTime);
-                }
-            }
-
             Destroy(gameObject);
         }
     }

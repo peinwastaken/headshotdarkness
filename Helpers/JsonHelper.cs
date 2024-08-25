@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
-using UnityEngine;
+using HeadshotDarkness.Enums;
+using HeadshotDarkness.Helpers;
+using BepInEx.Logging;
 
-namespace HeadshotDarkness
+namespace HeadshotDarkness.Helpers
 {
-    public enum EDeathString
-    {
-        Generic = 0,
-        Headshot = 1,
-        Explosion = 2,
-    }
-
     public class JsonHelper
     {
         public class DeathStrings
@@ -37,8 +32,31 @@ namespace HeadshotDarkness
 
             if (File.Exists(jsonPath))
             {
-                string jsonContent = File.ReadAllText(jsonPath);
-                deathStrings = JsonConvert.DeserializeObject<DeathStrings>(jsonContent);
+                try
+                {
+                    string jsonContent = File.ReadAllText(jsonPath);
+                    deathStrings = JsonConvert.DeserializeObject<DeathStrings>(jsonContent);
+                }
+                catch
+                {
+                    PluginDebug.LogError("Failed to load deathstrings.json, check for errors. Using default strings.");
+
+                    deathStrings = new DeathStrings
+                    {
+                        headshotDeathStrings = new List<string>
+                        {
+                            "You have been shot in the head."
+                        },
+                        explosionDeathStrings = new List<string>
+                        {
+                            "You have been blown up."
+                        },
+                        genericDeathStrings = new List<string>
+                        {
+                            "You are dead."
+                        }
+                    };
+                }
             }
         }
 

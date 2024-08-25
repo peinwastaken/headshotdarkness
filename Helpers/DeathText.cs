@@ -1,11 +1,19 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using BepInEx.Logging;
 
-namespace HeadshotDarkness
+namespace HeadshotDarkness.Helpers
 {
+    public struct DeathTextInfo
+    {
+        public string Text;
+        public bool Contextual;
+        public float Lifetime;
+        public float Size;
+        public float FadeInTime;
+        public float FadeOutTime;
+        public float FadeDelayTime;
+    }
     public class DeathTextHelper
     {
         public static GameObject deathTextObject { get; private set; }
@@ -15,7 +23,7 @@ namespace HeadshotDarkness
         {
             if (deathTextObject != null)
             {
-                GameObject.Destroy(deathTextObject);
+                UnityEngine.Object.Destroy(deathTextObject);
             }
 
             deathTextObject = new GameObject("DeathText", typeof(Canvas), typeof(CanvasScaler));
@@ -49,8 +57,6 @@ namespace HeadshotDarkness
 
     public class DeathTextManager : MonoBehaviour
     {
-        public ManualLogSource log;
-
         public float lifeTime;
         public float fadeInTime;
         public float fadeOutTime;
@@ -68,9 +74,6 @@ namespace HeadshotDarkness
             colorTransparent = new Color(1, 1, 1, 0);
             deathText.color = colorTransparent;
             timeAlive = 0f;
-
-            log = new ManualLogSource("DeathTextManager");
-            BepInEx.Logging.Logger.Sources.Add(log);
 
             StartCoroutine(DoDeathTextFade());
         }
@@ -94,16 +97,16 @@ namespace HeadshotDarkness
 
         private IEnumerator DoDeathTextFade()
         {
-            log.LogInfo("FadeDelay");
+            PluginDebug.LogInfo("FadeDelay");
             yield return new WaitForSeconds(fadeDelay); // fade delay
 
-            log.LogInfo("FadeIn");
+            PluginDebug.LogInfo("FadeIn");
             yield return StartCoroutine(FadeText(1f, fadeInTime)); // fade in
 
-            log.LogInfo("FadeHold");
+            PluginDebug.LogInfo("FadeHold");
             yield return new WaitForSeconds(lifeTime - (fadeInTime + fadeOutTime)); // hold fade
 
-            log.LogInfo("FadeOut");
+            PluginDebug.LogInfo("FadeOut");
             yield return StartCoroutine(FadeText(0f, fadeOutTime)); // fade out
         }
         public void Update()

@@ -1,24 +1,21 @@
 ﻿using BepInEx;
-using UnityEngine;
-using HeadshotDarkness.patches;
+using HeadshotDarkness.Patches;
 using BepInEx.Configuration;
-using System;
-using System.Collections.Generic;
-using HarmonyLib;
+using HeadshotDarkness.Helpers;
+using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.0.5")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
-        public static ConfigEntry<bool> DebugMode { get; set; }
-
-        public static ConfigEntry<float> ScreenFadeTime { get; set; }
-        public static ConfigEntry<bool> UseAlternateDeathFade { get; set; }
-        public static ConfigEntry<bool> ExplosionsDoDarkness { get; set; }
-        public static ConfigEntry<float> AudioFadeTime { get; set; }
         public static ConfigEntry<bool> DisableUIDeathSound { get; set; }
+
+        public static ConfigEntry<float> AudioFadeTime { get; set; }
+        public static ConfigEntry<EDarknessType> DarknessTypeHeadshot { get; set; }
+        public static ConfigEntry<EDarknessType> DarknessTypeExplosion { get; set; }
+        public static ConfigEntry<EDarknessType> DarknessTypeGeneric { get; set; }
 
         public static ConfigEntry<bool> DeathTextEnabled { get; set; }
         public static ConfigEntry<string> DeathTextString { get; set; }
@@ -29,29 +26,11 @@ namespace HeadshotDarkness
         public static ConfigEntry<float> DeathTextFadeOutTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeDelayTime { get; set; }
 
-        public static AnimationCurve enableCurve { get; set; }
-        public static AnimationCurve instantCurve { get; set; }
-
-        private void UpdateEnableCurve(object sender, EventArgs args) // weird............
-        {
-            enableCurve.keys = new Keyframe[]
-            {
-                new Keyframe(0f, 0f),
-                new Keyframe(ScreenFadeTime.Value, 2f)
-            };
-
-            instantCurve.keys = new Keyframe[]
-            {
-                new Keyframe(0f, 0f),
-                new Keyframe(0.001f, 2f)
-            };
-        }
-
         private void DoConfig()
         {
             string general = "1. General";
-            string parameters = "2. Parameters";
-            string deathText = "3. DeathText";
+            string deathFade = "2. Death Fade";
+            string deathText = "3. Death Text";
 
             // General
             Enabled = Config.Bind(general, "Enabled", true, new ConfigDescription(
@@ -60,114 +39,101 @@ namespace HeadshotDarkness
                     new ConfigurationManagerAttributes { Order = 1000 }
                 ));
 
-            UseAlternateDeathFade = Config.Bind(general, "DoScreenFlash", false, new ConfigDescription(
-                    "Lights out. Flashes white for a fraction of a second and instantly switches to black. Disables ScreenFadeTime",
-                    null,
-                    new ConfigurationManagerAttributes { Order = 999 }
-                ));
-
-            ExplosionsDoDarkness = Config.Bind(general, "ExplosionsDoDarkness", false, new ConfigDescription(
-                    "Set if explosions should cause the headshot effect.",
-                    null,
-                    new ConfigurationManagerAttributes { Order = 998 }
-                ));
-
-            DebugMode = Config.Bind(general, "AlwaysDoDarkness", false, new ConfigDescription(
-                    "Was only here to help me debug, if you for some reason want the headshot effect to always occur then enable it.",
+            DisableUIDeathSound = Config.Bind(general, "Disable UI Death Sound", false, new ConfigDescription(
+                    "Prevents the UI death sound from ever playing. It will always be disabled if the headshot effect occurs but this lets you disable it for all deaths.",
                     null,
                     new ConfigurationManagerAttributes { Order = 990 }
                 ));
 
-            DisableUIDeathSound = Config.Bind(general, "DisableUIDeathSound", false, new ConfigDescription(
-                    "Prevents the UI death sound from ever playing. It will always be disabled if the headshot effect occurs but this lets you disable it for bodyshot deaths.",
-                    null,
-                    new ConfigurationManagerAttributes { Order = 989 }
-                ));
-
-            // Parameters
-            ScreenFadeTime = Config.Bind(parameters, "ScreenFadeTime", 0.05f, new ConfigDescription(
-                    "Changes screen fade time",
-                    new AcceptableValueRange<float>(0.01f, 1f),
-                    new ConfigurationManagerAttributes { Order = 980 }
-                ));
-
-            AudioFadeTime = Config.Bind(parameters, "AudioFadeTime", 0.3f, new ConfigDescription(
+            // Death Fade
+            AudioFadeTime = Config.Bind(deathFade, "Audio Fade Time", 0.3f, new ConfigDescription(
                     "Changes audio fade time",
                     new AcceptableValueRange<float>(0.01f, 1f),
                     new ConfigurationManagerAttributes { Order = 970 }
                 ));
 
-            // DeathText Parameters
-            DeathTextEnabled = Config.Bind(deathText, "DeathTextEnabled", false, new ConfigDescription(
-                    "Enable/disable death text",
+            DarknessTypeHeadshot = Config.Bind(deathFade, "Headshot Fade Style", EDarknessType.Default, new ConfigDescription(
+                    "Changes darkness style for headshot deaths.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 969 }
+                ));
+
+            DarknessTypeExplosion = Config.Bind(deathFade, "Explosion Fade Style", EDarknessType.Vanilla, new ConfigDescription(
+                    "Changes darkness style for explosion deaths.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 968 }
+                ));
+
+            DarknessTypeGeneric = Config.Bind(deathFade, "Other Fade Style", EDarknessType.Vanilla, new ConfigDescription(
+                    "Changes darkness style for other deaths. Mostly a debug feature but if for whatever reason you want the effect to occur after a bodyshot kill then here you go.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 967 }
+                ));
+
+            // Death Text
+            DeathTextEnabled = Config.Bind(deathText, "Enable Death Text", false, new ConfigDescription(
+                    "Enable/disable death text. Only shown when the headshot effect occurs",
                     null,
                     new ConfigurationManagerAttributes { Order = 960 }
                 ));
 
-            DeathTextString = Config.Bind(deathText, "DeathTextString", "You are dead.", new ConfigDescription(
-                    "Set the headshot text string",
+            DeathTextString = Config.Bind(deathText, "Death Text String", "You are dead.", new ConfigDescription(
+                    "Set the death text string",
                     null,
                     new ConfigurationManagerAttributes { Order = 950 }
                 ));
 
-            DeathTextContextual = Config.Bind(deathText, "DeathTextContextual", false, new ConfigDescription(
-                    "Set if death texts should be contextual. Pulls random death strings from deathstrings.json depending on how you died instead of using the DeathTextString variable",
+            DeathTextContextual = Config.Bind(deathText, "Contextual Death Text", false, new ConfigDescription(
+                    "Set if death texts should be contextual. Pulls random death strings from deathstrings.json depending on how you died instead of using the Death Text String value",
                     null,
                     new ConfigurationManagerAttributes { Order = 949 }
                 ));
 
-            DeathTextFontSize = Config.Bind(deathText, "DeathTextFontSize", 24, new ConfigDescription(
-                    "Set the headshot text font size",
+            DeathTextFontSize = Config.Bind(deathText, "Death Text Size", 24, new ConfigDescription(
+                    "Set the death text font size",
                     new AcceptableValueRange<int>(1, 64),
                     new ConfigurationManagerAttributes { Order = 930 }
                 ));
 
-            DeathTextLifeTime = Config.Bind(deathText, "DeathTextLifeTime", 3f, new ConfigDescription(
+            DeathTextLifeTime = Config.Bind(deathText, "Death Text Lifetime", 3f, new ConfigDescription(
                     "Changes how long the death text is visible for",
                     new AcceptableValueRange<float>(0.01f, 5f),
                     new ConfigurationManagerAttributes { Order = 920 }
                 ));
 
-            DeathTextFadeInTime = Config.Bind(deathText, "DeathTextFadeInTime", 0.01f, new ConfigDescription(
+            DeathTextFadeInTime = Config.Bind(deathText, "Death Text Fade In Time", 0.01f, new ConfigDescription(
                     "Changes how long it takes for the death text to fade in",
                     new AcceptableValueRange<float>(0.01f, 1f),
                     new ConfigurationManagerAttributes { Order = 910 }
                 ));
 
-            DeathTextFadeOutTime = Config.Bind(deathText, "DeathTextFadeOutTime", 0.5f, new ConfigDescription(
+            DeathTextFadeOutTime = Config.Bind(deathText, "Death Text Fade Out Time", 0.5f, new ConfigDescription(
                     "Changes how long it takes for the death text to fade out",
                     new AcceptableValueRange<float>(0.01f, 1f),
                     new ConfigurationManagerAttributes { Order = 900 }
                 ));
 
-            DeathTextFadeDelayTime = Config.Bind(deathText, "DeathTextFadeDelayTime", 0.1f, new ConfigDescription(
-                    "Changes how long showing death text is delayed for",
+            DeathTextFadeDelayTime = Config.Bind(deathText, "Death Text Fade Delay Time", 0.01f, new ConfigDescription(
+                    "Changes how long the death text is delayed for",
                     new AcceptableValueRange<float>(0.01f, 1f),
                     new ConfigurationManagerAttributes { Order = 890 }
                 ));
-
-
-            ScreenFadeTime.SettingChanged += UpdateEnableCurve;
         }
 
         private void DoPatches()
         {
             new BeginDeathScreenPatch().Enable();
-            new EndDeathScreenPatch().Enable();
-            new PlayUiSoundPatch().Enable();
+            new PlayUISoundPatch().Enable();
         }
 
         private void Awake()
         {
+            PluginDebug.CreateLogger(Logger);
+
             DoConfig();
             DoPatches();
 
             JsonHelper.Initialize();
-
-            enableCurve = new AnimationCurve(
-                new Keyframe(0f, 0f),
-                new Keyframe(ScreenFadeTime.Value, 2f)
-            );
         }
     }
 }
