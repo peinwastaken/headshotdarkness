@@ -6,7 +6,7 @@ using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.0")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -122,7 +122,9 @@ namespace HeadshotDarkness
 
         private void DoPatches()
         {
+            new PlayerDiedPatch().Enable();
             new BeginDeathScreenPatch().Enable();
+            new EndDeathScreenPatch().Enable();
             new PlayUISoundPatch().Enable();
         }
 

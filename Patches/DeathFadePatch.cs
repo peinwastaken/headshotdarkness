@@ -2,28 +2,34 @@
 using System.Reflection;
 using System;
 using SPT.Reflection.Patching;
-using EFT.UI;
 using HeadshotDarkness.Helpers;
 using HeadshotDarkness.Enums;
-using JetBrains.Annotations;
-using UnityEngine;
 
 namespace HeadshotDarkness.Patches
 {
     public class BeginDeathScreenPatch : ModulePatch
     {
+        private static bool _shouldDoDarkness = false;
+
         protected override MethodBase GetTargetMethod()
         {
             return typeof(DeathFade).GetMethod(nameof(DeathFade.EnableEffect));
         }
 
+        public static void SetShouldDoDarkness(bool state)
+        {
+            _shouldDoDarkness = state;
+        }
+
         [PatchPrefix]
         private static bool PatchPrefix(DeathFade __instance)
         {
-            if (Plugin.Enabled.Value == false)
+            if (_shouldDoDarkness == false)
             {
                 return true;
             }
+
+            SetShouldDoDarkness(false);
 
             if (Plugin.DisableUIDeathSound.Value == true)
             {
@@ -61,6 +67,20 @@ namespace HeadshotDarkness.Patches
             }
 
             return false;
+        }
+    }
+
+    public class EndDeathScreenPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(DeathFade).GetMethod(nameof(DeathFade.DisableEffect));
+        }
+
+        [PatchPostfix]
+        private static void PatchPostfix(DeathFade __instance)
+        {
+            __instance.StartCoroutine(VolumeAdjuster.FadeVolume(1f, Plugin.AudioFadeTime.Value));
         }
     }
 }
