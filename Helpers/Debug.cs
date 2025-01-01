@@ -19,16 +19,19 @@ namespace HeadshotDarkness.Helpers
 
         public static void LogInfo(string message)
         {
+            if (!Plugin.Debug.Value) return;
             Logger?.LogInfo(message);
         }
 
         public static void LogWarning(string message)
         {
+            if (!Plugin.Debug.Value) return;
             Logger?.LogWarning(message);
         }
 
         public static void LogError(string message)
         {
+            if (!Plugin.Debug.Value) return;
             Logger?.LogError(message);
         }
     }

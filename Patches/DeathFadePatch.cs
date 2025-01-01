@@ -4,6 +4,7 @@ using System;
 using SPT.Reflection.Patching;
 using HeadshotDarkness.Helpers;
 using HeadshotDarkness.Enums;
+using Comfort.Common;
 
 namespace HeadshotDarkness.Patches
 {
@@ -18,6 +19,7 @@ namespace HeadshotDarkness.Patches
 
         public static void SetShouldDoDarkness(bool state)
         {
+            PluginDebug.LogInfo($"setting _shouldDoDarkness to {state.ToString()}");
             _shouldDoDarkness = state;
         }
 
@@ -30,6 +32,8 @@ namespace HeadshotDarkness.Patches
             }
 
             SetShouldDoDarkness(false);
+
+            PluginDebug.LogInfo("doing darkness");
 
             if (Plugin.DisableUIDeathSound.Value == true)
             {
@@ -46,27 +50,33 @@ namespace HeadshotDarkness.Patches
             {
                 deathType.GetField("animationCurve_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, Curves.EnableCurve);
                 deathType.GetField("bool_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, true);
+                deathType.GetField("float_3", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 3f);
 
                 if (darknessType == EDarknessType.ScreenFlash)
                 {
-                    ScreenFlash.StartFlash();
+                    ScreenFlashManager.Instance?.DoScreenFlash(0.05f);
+                }
+
+                if (Plugin.DeathTextEnabled.Value == true)
+                {
+                    string deathText = Util.GetDeathString(lastBodyPart, lastDamageType);
+                    DeathTextManager.Instance?.DoDeathText(
+                        deathText,
+                        Plugin.DeathTextFontSize.Value,
+                        Plugin.DeathTextLifeTime.Value,
+                        Plugin.DeathTextFadeInTime.Value,
+                        Plugin.DeathTextFadeOutTime.Value,
+                        Plugin.DeathTextFadeDelayTime.Value
+                    );
                 }
 
                 PlayUISoundPatch.SkipSound = true;
-                __instance.StartCoroutine(VolumeAdjuster.FadeVolume(0f, Plugin.AudioFadeTime.Value));
-            }
-            else
-            {
-                return true;
+                VolumeAdjuster.Instance?.FadeVolume(0f, Plugin.AudioFadeTime.Value);
+
+                return false;
             }
 
-            if (Plugin.DeathTextEnabled.Value == true)
-            {
-                string deathText = Util.GetDeathString(lastBodyPart, lastDamageType);
-                DeathTextHelper.CreateDeathText(deathText, Plugin.DeathTextFontSize.Value, Plugin.DeathTextLifeTime.Value, Plugin.DeathTextFadeInTime.Value, Plugin.DeathTextFadeOutTime.Value, Plugin.DeathTextFadeDelayTime.Value);
-            }
-
-            return false;
+            return true;
         }
     }
 
@@ -80,7 +90,7 @@ namespace HeadshotDarkness.Patches
         [PatchPostfix]
         private static void PatchPostfix(DeathFade __instance)
         {
-            __instance.StartCoroutine(VolumeAdjuster.FadeVolume(1f, Plugin.AudioFadeTime.Value));
+            VolumeAdjuster.Instance?.FadeVolume(1f, Plugin.AudioFadeTime.Value);
         }
     }
 }

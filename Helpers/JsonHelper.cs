@@ -20,11 +20,6 @@ namespace HeadshotDarkness.Helpers
 
         private static DeathStrings deathStrings;
 
-        public static void Initialize()
-        {
-            LoadDeathStrings();
-        }
-
         public static void LoadDeathStrings()
         {
             string dllPath = Assembly.GetExecutingAssembly().Location;

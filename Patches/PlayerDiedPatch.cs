@@ -1,4 +1,5 @@
 ﻿using EFT;
+using HeadshotDarkness.Helpers;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
@@ -11,10 +12,15 @@ namespace HeadshotDarkness.Patches
             return typeof(Player).GetMethod(nameof(Player.OnDead));
         }
 
-        [PatchPostfix]
-        private static void PatchPostfix(Player __instance)
+        [PatchPrefix]
+        private static bool PatchPostfix(Player __instance)
         {
-            BeginDeathScreenPatch.SetShouldDoDarkness(true);
+            if (__instance.IsYourPlayer) // lol
+            {
+                BeginDeathScreenPatch.SetShouldDoDarkness(true);
+            }
+
+            return true; // lol
         }
     }
 }

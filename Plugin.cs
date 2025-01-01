@@ -6,7 +6,7 @@ using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.1")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -25,12 +25,14 @@ namespace HeadshotDarkness
         public static ConfigEntry<float> DeathTextFadeInTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeOutTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeDelayTime { get; set; }
+        public static ConfigEntry<bool> Debug { get; set; }
 
         private void DoConfig()
         {
             string general = "1. General";
             string deathFade = "2. Death Fade";
             string deathText = "3. Death Text";
+            string debugText = "4. Debug";
 
             // General
             Enabled = Config.Bind(general, "Enabled", true, new ConfigDescription(
@@ -118,6 +120,13 @@ namespace HeadshotDarkness
                     new AcceptableValueRange<float>(0.01f, 1f),
                     new ConfigurationManagerAttributes { Order = 890 }
                 ));
+
+            // Debug
+            Debug = Config.Bind("Debug", debugText, true, new ConfigDescription(
+                    "Enable/disable debug logging in BepInEx console.",
+                    null,
+                    new ConfigurationManagerAttributes { Order = 880 }
+                ));
         }
 
         private void DoPatches()
@@ -128,14 +137,22 @@ namespace HeadshotDarkness
             new PlayUISoundPatch().Enable();
         }
 
+        private void DoGameObjects()
+        {
+            VolumeAdjuster.Create();
+            DeathTextManager.Create();
+            ScreenFlashManager.Create();
+        }
+
         private void Awake()
         {
             PluginDebug.CreateLogger(Logger);
 
             DoConfig();
             DoPatches();
+            DoGameObjects();
 
-            JsonHelper.Initialize();
+            JsonHelper.LoadDeathStrings();
         }
     }
 }
