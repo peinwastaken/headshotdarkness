@@ -4,8 +4,6 @@ using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
 using HeadshotDarkness.Enums;
-using HeadshotDarkness.Helpers;
-using BepInEx.Logging;
 
 namespace HeadshotDarkness.Helpers
 {

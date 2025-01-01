@@ -4,17 +4,6 @@ using System.Collections;
 
 namespace HeadshotDarkness.Helpers
 {
-    public struct DeathTextInfo
-    {
-        public string Text;
-        public bool Contextual;
-        public float Lifetime;
-        public float Size;
-        public float FadeInTime;
-        public float FadeOutTime;
-        public float FadeDelayTime;
-    }
-
     public class DeathTextManager : MonoBehaviour
     {
         public static DeathTextManager Instance { get; private set; }

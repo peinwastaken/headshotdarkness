@@ -6,7 +6,7 @@ using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.0")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.1.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -25,6 +25,7 @@ namespace HeadshotDarkness
         public static ConfigEntry<float> DeathTextFadeInTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeOutTime { get; set; }
         public static ConfigEntry<float> DeathTextFadeDelayTime { get; set; }
+
         public static ConfigEntry<bool> Debug { get; set; }
 
         private void DoConfig()
@@ -131,10 +132,8 @@ namespace HeadshotDarkness
 
         private void DoPatches()
         {
-            new PlayerDiedPatch().Enable();
-            new BeginDeathScreenPatch().Enable();
-            new EndDeathScreenPatch().Enable();
             new PlayUISoundPatch().Enable();
+            new OnGameStartedPatch().Enable();
         }
 
         private void DoGameObjects()
@@ -142,6 +141,7 @@ namespace HeadshotDarkness
             VolumeAdjuster.Create();
             DeathTextManager.Create();
             ScreenFlashManager.Create();
+            DarknessManager.Create();
         }
 
         private void Awake()
