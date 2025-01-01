@@ -50,7 +50,6 @@ namespace HeadshotDarkness.Patches
             {
                 deathType.GetField("animationCurve_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, Curves.EnableCurve);
                 deathType.GetField("bool_0", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, true);
-                deathType.GetField("float_3", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(__instance, 3f);
 
                 if (darknessType == EDarknessType.ScreenFlash)
                 {

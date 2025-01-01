@@ -1,5 +1,4 @@
 ﻿using EFT;
-using HeadshotDarkness.Helpers;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
