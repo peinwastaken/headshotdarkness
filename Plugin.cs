@@ -134,6 +134,7 @@ namespace HeadshotDarkness
         {
             new PlayUISoundPatch().Enable();
             new OnGameStartedPatch().Enable();
+            new DeathFadeDisablePatch().Enable();
         }
 
         private void DoGameObjects()
