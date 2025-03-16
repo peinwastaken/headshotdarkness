@@ -6,7 +6,7 @@ using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.1")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }

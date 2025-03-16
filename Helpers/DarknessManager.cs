@@ -1,5 +1,4 @@
-﻿using Comfort.Common;
-using EFT;
+﻿using EFT;
 using EFT.HealthSystem;
 using HeadshotDarkness.Enums;
 using HeadshotDarkness.Patches;
