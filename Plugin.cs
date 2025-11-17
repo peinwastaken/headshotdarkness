@@ -1,12 +1,13 @@
 ﻿using BepInEx;
 using HeadshotDarkness.Patches;
 using BepInEx.Configuration;
+using HeadshotDarkness.Components;
 using HeadshotDarkness.Helpers;
 using HeadshotDarkness.Enums;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.3")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.4")]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigEntry<bool> Enabled { get; set; }
@@ -137,7 +138,7 @@ namespace HeadshotDarkness
             new DeathFadeDisablePatch().Enable();
         }
 
-        private void DoGameObjects()
+        public static void CreateGameObjects()
         {
             VolumeAdjuster.Create();
             DeathTextManager.Create();
@@ -151,7 +152,6 @@ namespace HeadshotDarkness
 
             DoConfig();
             DoPatches();
-            DoGameObjects();
 
             JsonHelper.LoadDeathStrings();
         }

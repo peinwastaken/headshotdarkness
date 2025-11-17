@@ -1,4 +1,4 @@
-﻿using HeadshotDarkness.Helpers;
+﻿using HeadshotDarkness.Components;
 using SPT.Reflection.Patching;
 using System.Reflection;
 

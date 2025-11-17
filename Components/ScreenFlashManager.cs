@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using HeadshotDarkness.Helpers;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace HeadshotDarkness.Helpers
+namespace HeadshotDarkness.Components
 {
     public class ScreenFlashManager : MonoBehaviour
     {

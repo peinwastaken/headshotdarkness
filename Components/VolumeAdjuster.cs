@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using HeadshotDarkness.Helpers;
+using System.Collections;
 using UnityEngine;
 
-namespace HeadshotDarkness.Helpers
+namespace HeadshotDarkness.Components
 {
     public class VolumeAdjuster : MonoBehaviour
     {

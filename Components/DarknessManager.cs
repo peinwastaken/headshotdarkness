@@ -1,12 +1,13 @@
 ﻿using EFT;
 using EFT.HealthSystem;
 using HeadshotDarkness.Enums;
+using HeadshotDarkness.Helpers;
 using HeadshotDarkness.Patches;
 using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace HeadshotDarkness.Helpers
+namespace HeadshotDarkness.Components
 {
     public class DarknessManager : MonoBehaviour
     {

@@ -1,12 +1,7 @@
 ﻿using EFT;
-using HeadshotDarkness.Helpers;
+using HeadshotDarkness.Components;
 using SPT.Reflection.Patching;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HeadshotDarkness.Patches
 {
@@ -20,6 +15,8 @@ namespace HeadshotDarkness.Patches
         [PatchPostfix]
         public static void PatchPostfix()
         {
+            Plugin.CreateGameObjects();
+            
             DarknessManager.Instance.OnGameStarted();
         }
     }

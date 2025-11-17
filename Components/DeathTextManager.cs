@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using HeadshotDarkness.Helpers;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace HeadshotDarkness.Helpers
+namespace HeadshotDarkness.Components
 {
     public class DeathTextManager : MonoBehaviour
     {
