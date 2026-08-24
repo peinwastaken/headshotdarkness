@@ -1,3 +1,4 @@
+using EFT;
 using HeadshotDarkness.Enums;
 using System.Collections.Generic;
 using TMPro;
@@ -10,8 +11,9 @@ namespace HeadshotDarkness.Helpers
 
         public static void LoadFonts()
         {
-            IEnumerable<TMP_FontAsset> tarkovFonts = LocaleManagerClass.LocaleManagerClass.Ienumerable_1;
+            IEnumerable<TMP_FontAsset> tarkovFonts = LocalizationManager.Instance._allFonts;
 
+            // this is stupid. idgaf
             foreach (TMP_FontAsset font in tarkovFonts)
             {
                 if (font.name.ToLower().Contains("arial - normal"))

@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.CameraControl;
 using EFT.HealthSystem;
 using HeadshotDarkness.Enums;
 using HeadshotDarkness.Helpers;
@@ -31,7 +32,7 @@ namespace HeadshotDarkness.Components
         {
             _localPlayer = Util.GetLocalPlayer();
             _activeHealthController = _localPlayer.ActiveHealthController;
-            _camera = CameraClass.Instance.Camera;
+            _camera = CameraManager.Instance.Camera;
             _deathFade = _camera.GetComponent<DeathFade>();
 
             _activeHealthController.DiedEvent += OnPlayerDied;
