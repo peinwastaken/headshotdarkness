@@ -18,7 +18,6 @@ namespace HeadshotDarkness.Components
         private ActiveHealthController _activeHealthController;
         private Camera _camera;
         private DeathFade _deathFade;
-        private FieldInfo _animationCurveField = typeof(DeathFade).GetField("animationCurve_0", BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static DarknessManager Create()
         {
@@ -67,7 +66,7 @@ namespace HeadshotDarkness.Components
         {
             if (darknessType != EDarknessType.Vanilla)
             {
-                _animationCurveField?.SetValue(_deathFade, Curves.EnableCurve);
+                _deathFade._enableCurve = Curves.EnableCurve;
 
                 if (darknessType == EDarknessType.ScreenFlash)
                 {
