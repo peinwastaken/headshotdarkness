@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace HeadshotDarkness
 {
-    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.4")]
+    [BepInPlugin("com.pein.headshotdarkness", "HeadshotDarkness", "1.2.5")]
     public class Plugin : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
