@@ -33,6 +33,7 @@ namespace HeadshotDarkness.Components
             _activeHealthController = _localPlayer.ActiveHealthController;
             _camera = CameraManager.Instance.Camera;
             _deathFade = _camera.GetComponent<DeathFade>();
+            _deathFade._enableCurve = Curves.EnableCurve;
 
             _activeHealthController.DiedEvent += OnPlayerDied;
         }
@@ -64,31 +65,27 @@ namespace HeadshotDarkness.Components
 
         private void DoHeadshotDarkness(EBodyPart lastBodyPart, EDamageType lastDamageType, EDarknessType darknessType)
         {
-            if (darknessType != EDarknessType.Vanilla)
+            if (darknessType == EDarknessType.Vanilla) return;
+            if (darknessType == EDarknessType.ScreenFlash)
             {
-                _deathFade._enableCurve = Curves.EnableCurve;
-
-                if (darknessType == EDarknessType.ScreenFlash)
-                {
-                    ScreenFlashManager.Instance?.DoScreenFlash(0.05f);
-                }
-
-                if (Plugin.DeathTextEnabled.Value == true)
-                {
-                    string deathText = Util.GetDeathString(lastBodyPart, lastDamageType);
-                    DeathTextManager.Instance?.DoDeathText(
-                        deathText,
-                        Plugin.DeathTextFontSize.Value,
-                        Plugin.DeathTextLifeTime.Value,
-                        Plugin.DeathTextFadeInTime.Value,
-                        Plugin.DeathTextFadeOutTime.Value,
-                        Plugin.DeathTextFadeDelayTime.Value
-                    );
-                }
-
-                PlayUISoundPatch.SkipSound = true;
-                VolumeAdjuster.Instance?.FadeVolume(0f, Plugin.AudioFadeTime.Value);
+                ScreenFlashManager.Instance?.DoScreenFlash(0.05f);
             }
+
+            if (Plugin.DeathTextEnabled.Value == true)
+            {
+                string deathText = Util.GetDeathString(lastBodyPart, lastDamageType);
+                DeathTextManager.Instance?.DoDeathText(
+                    deathText,
+                    Plugin.DeathTextFontSize.Value,
+                    Plugin.DeathTextLifeTime.Value,
+                    Plugin.DeathTextFadeInTime.Value,
+                    Plugin.DeathTextFadeOutTime.Value,
+                    Plugin.DeathTextFadeDelayTime.Value
+                );
+            }
+
+            PlayUISoundPatch.SkipSound = true;
+            VolumeAdjuster.Instance?.FadeVolume(0f, Plugin.AudioFadeTime.Value);
         }
     }
 }
